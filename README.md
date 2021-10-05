@@ -108,6 +108,7 @@ CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 
 ## Other Projects/References that use the UUID Shellcode Loading Technique
 + [byt3bl33d3r/OffensiveNim](https://github.com/byt3bl33d3r/OffensiveNim/blob/2cb5f8b4691ee430fbfad084d3cb863a0ca2f0b7/src/uuid_exec_bin.nim)
-- https://research.nccgroup.com/2021/01/23/rift-analysing-a-lazarus-shellcode-execution-method/
-- https://blog.sunggwanchoi.com/eng-uuid-shellcode-execution/
-- https://gist.github.com/rxwx/c5e0e5bba8c272eb6daa587115ae0014#file-uuid-c
++ https://research.nccgroup.com/2021/01/23/rift-analysing-a-lazarus-shellcode-execution-method/
++ https://blog.sunggwanchoi.com/eng-uuid-shellcode-execution/
++ https://gist.github.com/rxwx/c5e0e5bba8c272eb6daa587115ae0014#file-uuid-c
++ [Adepts of 0xCC - One thousand and one ways to copy your shellcode to memory (VBA Macros)](https://adepts.of0x.cc/alternatives-copy-shellcode/)
