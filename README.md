@@ -1,4 +1,4 @@
-# Module-Stomping UUID2Shellcode HellsGate Dropper
+# Ninja UUID Dropper
 Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
 
 #### Created with [Matt Kingstone](https://twitter.com/n00bRage)
