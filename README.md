@@ -1,5 +1,7 @@
 # Module-Stomping UUID2Shellcode HellsGate Dropper
-Module Stomping, No New Thread, HellsGate syscaller, UUID to shellcode Dropper for x64 Windows 10!
+Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
+
+#### Created with [Matt Kingstone](https://twitter.com/n00bRage)
 
 ## About
 Typically shellcode is loaded into the processes Heap or the `VirtualAlloc()` API is used to reserve a private section of memory within the process. For the shellcode to execute, the allocated memory must be marked executable. This is typically done by calling the `VirtualProtect()` API to change the allocated memory from `RW` (Read-Write) to `RX` (Read-Execute). These executable memory sections are easy to detect when they are not backed by a module, such as the executable section of the host process or a Dynamically Loaded Libraries (DLLs) executable code section. To evade this detection, Module Stomping can be used.
@@ -18,7 +20,6 @@ This dropper uses the Module Stomping technique described above, in combination 
 + Changes the memory protection of the DLL using syscalls
 + "No New Thread" technique which uses `EnumSystemLocalesA()` to execute the UUID decoded shellcode
 
-#### Created with [Matt Kingstone](https://twitter.com/n00bRage)
 
 ## Walkthrough Example with MSF PopCalc
 ### MSFVenom PopCalc Shellcode Creation
