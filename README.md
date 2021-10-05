@@ -1,5 +1,20 @@
 # Module-Stomping UUID2Shellcode HellsGate Dropper
-Dropper that loads DLL into memory, changes DLL `.TEXT` section to RW, decodes shellcode from UUID &amp; writes to DLL `.TEXT` section, changes DLL `.TEXT` section back to RX, and uses `EnumSystemLocalesA()` to jump to shellcode &amp; execute!
+Module Stomping, No New Thread, HellsGate syscaller, UUID to shellcode Dropper for x64 Windows 10!
+
+## About
+Typically shellcode is loaded into the processes Heap or the `VirtualAlloc()` API is used to reserve a private section of memory within the process. For the shellcode to execute, the allocated memory must be marked executable. This is typically done by calling the `VirtualProtect()` API to change the allocated memory from `RW` (Read-Write) to `RX` (Read-Execute). These executable memory sections are easy to detect when they are not backed by a module, such as the executable section of the host process or a Dynamically Loaded Libraries (DLLs) executable code section. To evade this detection, Module Stomping can be used.
+Module Stomping is where the malware will load a DLL into the processes memory using the `LoadLibrary()` API, change the permissions of the loaded libraries memory to `RW` (writable), overwrite the DLL memory with the shellcode, change the module-backed memory back to `RX` (executable), and then execute the shellcode from the DLL memory. When the memory is scanned, the shellcode will appear to be just the executable code from the loaded DLL. Therefor this may evade some AV/EDR dynamic memory scanners.
+Sektor7 does a better job of explaining it, and I recommend you check out there courses if you'd like to dive deeper: [institute.sektor7.net](https://institute.sektor7.net/)
+
+This dropper uses the Module Stomping technique described above, in combination with the:
++ Deobfuscates the shellcode payload from UUIDs
+  + The UUID payload helps to decrease the shellcodes entropy, which can help evade some detection methods 
++ Crawls the in memory list of loaded modules to discover the base addresses of `ntdll.dll` and `kernel32.dll`
++ Resolves `NTAPI` & `WINAPI` APIs by using a custom implementation of `GetProcAddress()` written in Assembly
++ HellGate Technique to resolve the Windows System Calls dynamically by reading the memory of `ntdll.dll`
++ Uses HalosGate Technique to resolve the Windows System Calls if `ntdll.dll` is hooked by AV/EDR
++ Changes the memory protection of the DLL using syscalls
++ "No New Thread" technique which uses `EnumSystemLocalesA()` to execute the UUID decoded shellcode
 
 #### Created with [Matt Kingstone](https://twitter.com/n00bRage)
 
