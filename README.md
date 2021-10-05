@@ -49,6 +49,9 @@ CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 ```
 + Replace the `CHAR sLib[]` array in `main.c` with the newly generated one.
 ## Credits / References
++ [Stephan Borosh (rvrsh3ll|@424f424f)](https://twitter.com/424f424f) & [Matt Kingstone](https://twitter.com/n00bRage) for showing me the awesome UUID shellcode loading technique.
++ [ajpc500/binToUUIDs.py](https://gist.github.com/ajpc500/a9695eca6a660d1fb5ec30a2e356f33e)
++ [Secure Hat - Shellcode Execution via EnumSystemLocalA](https://blog.securehat.co.uk/process-injection/shellcode-execution-via-enumsystemlocala)
 ### Implementing ASM in Visual Studio C Projects
 + [bs - Implementing Syscalls In The Cobaltstrike Artifact Kit](https://br-sn.github.io/Implementing-Syscalls-In-The-CobaltStrike-Artifact-Kit/)
 ### HalosGate SysCaller
@@ -61,3 +64,9 @@ CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
   + Link to the [Hell's Gate paper: https://vxug.fakedoma.in/papers/VXUG/Exclusive/HellsGate.pdf](https://vxug.fakedoma.in/papers/VXUG/Exclusive/HellsGate.pdf)
 ### Great Resource for learning Intel ASM - [Vivek Ramachandran (@vivekramac)](https://twitter.com/vivekramac)
 + [Pentester Academy - SLAE64](https://www.pentesteracademy.com/course?id=7)
+
+## Other Projects/References that use the UUID Shellcode Loading Technique
++ [byt3bl33d3r/OffensiveNim](https://github.com/byt3bl33d3r/OffensiveNim/blob/2cb5f8b4691ee430fbfad084d3cb863a0ca2f0b7/src/uuid_exec_bin.nim)
+- https://research.nccgroup.com/2021/01/23/rift-analysing-a-lazarus-shellcode-execution-method/
+- https://blog.sunggwanchoi.com/eng-uuid-shellcode-execution/
+- https://gist.github.com/rxwx/c5e0e5bba8c272eb6daa587115ae0014#file-uuid-c
