@@ -1,6 +1,8 @@
 # Ninja UUID Dropper
 Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
 
+![](./ninja.jpg)
+
 #### Created by [Bobby Cooke (@0xBoku)](https://twitter.com/0xBoku) with [Matt Kingstone(@n00bRage)](https://twitter.com/n00bRage)
 
 ## About
