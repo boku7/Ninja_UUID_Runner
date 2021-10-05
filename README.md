@@ -16,7 +16,7 @@ Saved as: calc.bin
 ### Raw Shellcode File to UUIDs
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
-└─$ python3 bin2uuid.py calc.bin                                                                      
+└─$ python3 bin2uuid.py calc.bin
     const char* uuids[] =
     {
         "e48348fc-e8f0-00c0-0000-415141505251",
