@@ -1,5 +1,7 @@
 # Module-Stomping UUID2Shellcode HellsGate Dropper
- Dropper that loads DLL into memory, changes DLL .TEXT section to RW, decodes shellcode from UUID &amp; writes to DLL .TEXT section, changes DLL .TEXT section back to RX, and uses EnumSystemLocalesA() to jump to shellcode &amp; execute!
+Dropper that loads DLL into memory, changes DLL `.TEXT` section to RW, decodes shellcode from UUID &amp; writes to DLL `.TEXT` section, changes DLL `.TEXT` section back to RX, and uses `EnumSystemLocalesA()` to jump to shellcode &amp; execute!
+
+#### Created with [Matt Kingstone](https://twitter.com/n00bRage)
 
 ## Walkthrough Example with MSF PopCalc
 ### MSFVenom PopCalc Shellcode Creation
