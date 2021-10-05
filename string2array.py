@@ -1,3 +1,4 @@
+# Author: Bobby Cooke (0xBoku/boku/boku7) // SpiderLabs // https://twitter.com/0xBoku // github.com/boku7 // https://www.linkedin.com/in/bobby-cooke/ // https://0xboku.com
 import sys
 # Example:
 #   bobby.cooke$ python3 string2Array.py tenantId "1d5551a0-f4f2-4101-9c3b-394247ec7e08"
