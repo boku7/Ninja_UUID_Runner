@@ -3,7 +3,9 @@ Module Stomping, No New Thread, HellsGate syscaller, UUID to shellcode Dropper f
 
 ## About
 Typically shellcode is loaded into the processes Heap or the `VirtualAlloc()` API is used to reserve a private section of memory within the process. For the shellcode to execute, the allocated memory must be marked executable. This is typically done by calling the `VirtualProtect()` API to change the allocated memory from `RW` (Read-Write) to `RX` (Read-Execute). These executable memory sections are easy to detect when they are not backed by a module, such as the executable section of the host process or a Dynamically Loaded Libraries (DLLs) executable code section. To evade this detection, Module Stomping can be used.
+
 Module Stomping is where the malware will load a DLL into the processes memory using the `LoadLibrary()` API, change the permissions of the loaded libraries memory to `RW` (writable), overwrite the DLL memory with the shellcode, change the module-backed memory back to `RX` (executable), and then execute the shellcode from the DLL memory. When the memory is scanned, the shellcode will appear to be just the executable code from the loaded DLL. Therefor this may evade some AV/EDR dynamic memory scanners.
+
 Sektor7 does a better job of explaining it, and I recommend you check out there courses if you'd like to dive deeper: [institute.sektor7.net](https://institute.sektor7.net/)
 
 This dropper uses the Module Stomping technique described above, in combination with the:
