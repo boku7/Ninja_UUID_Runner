@@ -1,4 +1,4 @@
-# ModStomp_UUID2Shellcode_Dropper
+# Module-Stomping UUID2Shellcode HellsGate Dropper
  Dropper that loads DLL into memory, changes DLL .TEXT section to RW, decodes shellcode from UUID &amp; writes to DLL .TEXT section, changes DLL .TEXT section back to RX, and uses EnumSystemLocalesA() to jump to shellcode &amp; execute!
 
 ## MSFVenom PopCalc Shellcode Creation
@@ -48,3 +48,16 @@ Saved as: calc.bin
 CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 ```
 + Replace the `CHAR sLib[]` array in `main.c` with the newly generated one.
+## Credits / References
+### Implementing ASM in Visual Studio C Projects
++ [bs - Implementing Syscalls In The Cobaltstrike Artifact Kit](https://br-sn.github.io/Implementing-Syscalls-In-The-CobaltStrike-Artifact-Kit/)
+### HalosGate SysCaller
++ [Reenz0h from @SEKTOR7net](https://twitter.com/SEKTOR7net)
+  + Most of the C techniques I use are from [Reenz0h's awesome Sektor7 courses](https://institute.sektor7.net/) & blogs 
+  + [Sektor7 HalosGate Blog](https://blog.sektor7.net/#!res/2021/halosgate.md)
+### HellsGate Syscaller
++ [@smelly__vx](https://twitter.com/smelly__vx) & [@am0nsec](https://twitter.com/am0nsec) ( Creators/Publishers of the Hells Gate technique )
+  + [HellsGate Github Repo](https://github.com/am0nsec/HellsGate)
+  + Link to the [Hell's Gate paper: https://vxug.fakedoma.in/papers/VXUG/Exclusive/HellsGate.pdf](https://vxug.fakedoma.in/papers/VXUG/Exclusive/HellsGate.pdf)
+### Great Resource for learning Intel ASM - [Vivek Ramachandran (@vivekramac)](https://twitter.com/vivekramac)
++ [Pentester Academy - SLAE64](https://www.pentesteracademy.com/course?id=7)
