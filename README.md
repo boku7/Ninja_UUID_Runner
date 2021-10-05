@@ -24,6 +24,9 @@ This dropper uses the Module Stomping technique described above, in combination 
 
 
 ## Walkthrough Example with MSF PopCalc
++ First you will need a raw binary file that contains your shellcode.
++ For this example we will use MetaSploit's MSFVenom to create a simple "Pop Calc" shellcode for x64 Windows 10.
+  + This shellcode was created from a Kali Linux virtual machine. 
 ### MSFVenom PopCalc Shellcode Creation
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
@@ -36,6 +39,8 @@ Saved as: calc.bin
 ```
 
 ### Raw Shellcode File to UUIDs
++ Now that we have our raw shellcode file `calc.bin` we will use the `bin2uuid.py` python3 script to convert our shellcode into an array of UUIDs.
++ For large shellcodes, I recommend piping the output from the python script to a file. Then transfer the file over to your windows workstation where you will be compiling the dropper with windows Visual Studios.
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 bin2uuid.py calc.bin
@@ -63,14 +68,25 @@ Saved as: calc.bin
 ```
 
 ### Copy UUID Shellcode to `main.c`
++ Copy the array of UUIDs to your windows workstation either via the copy-paste buffer or a file.
++ Open this project in Microsoft Visual Studios.
++ Within the `main.c` file, replace the `uuids[]` array with your array of UUIDs.
 
 ### Optionally Change Sacraficial DLL
++ You may optionally change the sacraficial DLL that has its `RX` section module stomped by our shellcode by changing the `sLib[]` array to a name of a different DLL.
++ Make sure that the DLL is large enough to hold your shellcode or else you may end up overwriting a neighbor DLL in memory of the process.
++  Use the `string2array.py` python script to convert the DLL name into an array of chars. 
+  +  Alternatively just use a typical string method since we are not creating a Beacon Object File (BOF) or shellcode.
 ```bash
 ┌──(bobby.cooke@0xBoku)-[~]
 └─$ python3 string2array.py sLib mshtml.dll
 CHAR sLib[] = {'m','s','h','t','m','l','.','d','l','l',0};
 ```
 + Replace the `CHAR sLib[]` array in `main.c` with the newly generated one.
+
+### Compile with Visual Studios
++ Once you have made your changes, compile the EXE with Visual Studios
++ If you are using the example provided, a calculator should popup when you press the green play button within Visual Studios.
 
 ## Credits / References
 + [Stephan Borosh (rvrsh3ll|@424f424f)](https://twitter.com/424f424f) & [Matt Kingstone](https://twitter.com/n00bRage) for showing me the awesome UUID shellcode loading technique.
