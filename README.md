@@ -12,15 +12,16 @@ Module Stomping is where the malware will load a DLL into the processes memory u
 
 Sektor7 does a better job of explaining it, and I recommend you check out there courses if you'd like to dive deeper: [institute.sektor7.net](https://institute.sektor7.net/)
 
-This dropper uses the Module Stomping technique described above, in combination with the:
-+ Deobfuscates the shellcode payload from UUIDs
-  + The UUID payload helps to decrease the shellcodes entropy, which can help evade some detection methods 
-+ Crawls the in memory list of loaded modules to discover the base addresses of `ntdll.dll` and `kernel32.dll`
-+ Resolves `NTAPI` & `WINAPI` APIs by using a custom implementation of `GetProcAddress()` written in Assembly
-+ HellGate Technique to resolve the Windows System Calls dynamically by reading the memory of `ntdll.dll`
-+ Uses HalosGate Technique to resolve the Windows System Calls if `ntdll.dll` is hooked by AV/EDR
-+ Changes the memory protection of the DLL using syscalls
-+ "No New Thread" technique which uses `EnumSystemLocalesA()` to execute the UUID decoded shellcode
+This dropper uses the Module Stomping technique described above, in combination with these techniques:
++ UUID Obfuscation of the shellcode payload. 
+  + The UUID payload helps to decrease the shellcodes entropy, which can help evade some detection methods. 
+  + This method also helps prevent some in-memory detections which flag on signatures.
++ Crawl the in-memory list of loaded modules to discover the base addresses of `ntdll.dll` and `kernel32.dll`.
++ Resolve `NTAPI` & `WINAPI` APIs by using a custom implementation of `GetProcAddress()` written in Assembly.
++ HellGate technique to resolve the Windows System Calls dynamically by reading the memory of `ntdll.dll`.
++ HalosGate technique to resolve the Windows System Calls if `ntdll.dll` is hooked by AV/EDR.
++ Direct Syscalls to changes the memory protection of the DLL which will host the shellcode.
++ "No New Thread" technique which uses `EnumSystemLocalesA()` to execute the UUID decoded shellcode.
 
 
 ## Walkthrough Example with MSF PopCalc
