@@ -131,7 +131,7 @@ int main()
         "c48348d5-3c28-7c06-0a80-fbe07505bb47",
         "6a6f7213-5900-8941-daff-d563616c632e",
         "00657865-9090-9090-9090-909090909090"
-
+    };
 
     // Get Base Address of ntdll.dll
     WCHAR* ws_ntdll = L"ntdll.dll";
