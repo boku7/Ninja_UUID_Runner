@@ -1,4 +1,4 @@
-# Author: Bobby Cooke (0xBoku/boku/boku7) // SpiderLabs // https://twitter.com/0xBoku // github.com/boku7 // https://www.linkedin.com/in/bobby-cooke/ // https://0xboku.com
+# Author: Bobby Cooke (0xBoku/boku/boku7) // https://twitter.com/0xBoku // github.com/boku7 // https://www.linkedin.com/in/bobby-cooke/ // https://0xboku.com
 # Modified code from: https://blog.securehat.co.uk/process-injection/shellcode-execution-via-enumsystemlocala
 #!usr/bin/python3
 
