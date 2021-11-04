@@ -14,7 +14,7 @@ Since the CRTO labs have Cobalt Strike, for security reasons they are not connec
 
 ### Cobalt Strike Stageless Beacon Walkthrough
 
-1. Start your Cobalt Strike `teamserver` & the `cobaltstrike` gui on the linux box
+1. Start your Cobalt Strike `teamserver` & the `cobaltstrike` gui on the Kali-Attacker box
 + In the CRTO labs, `cobaltstrike` is located in the `/opt/` directory, but this may differ based on your installation.
 ```bash
 root@kali:/opt/cobaltstrike# ifconfig
