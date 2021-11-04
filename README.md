@@ -1,4 +1,4 @@
-# Ninja UUID Dropper
+# Ninja UUID Shellcode Runner
 Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
 
 ![](./ninja.jpg)
