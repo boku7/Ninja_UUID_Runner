@@ -1,9 +1,128 @@
 # Ninja UUID Shellcode Runner
 Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
++ Now supports running Cobalt Strike Stageless Beacon Payloads!
 
-![](./ninja.jpg)
+![](./images/ninja.jpg)
 
 #### Created by [Bobby Cooke (@0xBoku)](https://twitter.com/0xBoku) with [Matt Kingstone(@n00bRage)](https://twitter.com/n00bRage)
+
+## Update - Cobalt Strike Stageless Beacon Support (11/4/21)
+This was tested in the [new Certified Red Team Operator course labs](https://www.zeropointsecurity.co.uk/red-team-ops/overview) which now offers Cobalt Strike access out-of-the-box. If you are interested in digging deeper into Cobalt Strike, I definitely recommend getting your hands dirty with this course!
+
+Since the CRTO labs have Cobalt Strike, for security reasons they do not have connection to the internet. Another hurdle is we cannot copy entire files to and from our CRTO lab. What we can do, is copy-paste text from our host to the the CRTO lab. Since I think these labs are awesome, This walkthrough shows how to get this project working in the CRTO lab environment. 
+
+### Cobalt Strike Stageless Beacon Walkthrough
+
+1. Start your Cobalt Strike teamserver & the `cobaltstrike` gui on the linux box
++ In the CRTO labs, `cobaltstrike` is located in the `/opt/` directory, but this may differ based on your installation.
+```bash
+root@kali:/opt/cobaltstrike# ifconfig
+eth0: inet 10.10.5.120 
+# Start the teamserver with the password myPassword123
+root@kali:/opt/cobaltstrike# ./teamserver 10.10.5.120 myPassword123
+# Launch the cobaltstrike GUI and connect to it with any username and the password above
+root@kali:/opt/cobaltstrike# ./cobaltstrike
+```
+##### Screenshot of starting & connecting to the teamserver from the CRTO Kali-Attacker box
+![](./images/connect.png)
+
+2. Create a Listener that our stageless beacon payload will connect to, when it is executed on the windows host  
++ From the CobaltStrike GUI, click `Cobalt Strike` from the menu bar, and then select `Listeners`
++ This will display the active listeners in a table, on the bottom half of the CS GUI
+![](./images/1listen.png)
+
++ From the listeners table, click the `Add` button. A listener window will popup
++ Select your beacon type, such as `HTTP Beacon` used in this example
++ Give it a name, such as `http` used here
++ For the `HTTP Hosts`, click the `+` button and add the teamservers IP
++ When the beacon listener is the way you want it, click `Save`
+![](./images/2l.png)
+
+3. Create a 64-bit Stageless Cobalt Strike beacon shellcode payload
++ From the CobaltStrike GUI, click `Attacks` from the menu bar, then `Packages`, and select `Windows Executable (S)`
+  + The `(S)` means that the payload will be Stageless. A Stageless payload has the entire beacon in it, while the Staged version only has a small stub that calls out to the teamserver and then loads the rest of the beacon.
+  + The Staged loader used in Cobalt Strike is flagged. A Staged payload will likely be detected. 
+![](./images/3w.png)
+
++ Select the `http` listener we just created.
++ Change the `Output:` to `Raw`
+  + The `Raw` payload will save our Stageless Beacon as pure shellcode.
+  + Since the Cobalt Strike Beacon uses the Reflective DLL Loading technique, the shellcode will execute the beacon when it is ran on an Intel x64 processor within a Windows OS.
+![](./images/2l.png)
+
+4. Switch to the Windows host and prepare the UUID runner to run our Beacon payload.
++ Open Visual Studios, and create a blank C++ project.
++ Within the new project, right-click the `Source-File` folder and click `Add`
+![](./images/newitem.png)
+
++ Select `C++ File (.cpp)` and change the name to `main.c`
+![](./images/newitem2.png)
+
++ Do this again and create the file `functions.asm`
+
++ At this point we will have 2 files in our project. 
++ Copy the code in `main.c` of this repo to the `main.c` file we just created in Visual Studios on our Windows-Attacker box within the CRTO labs.
++ Copy the code in `functions.asm` of this repo to the `functions.asm` file on our Windows-Attacker box.
+![](./images/2files.png)
+
++ In the VS Solution Explorer, select the Project.
++ Now select Project from the VS menu, and then `Build Customizations...`
+![](./images/build1.png)
+
++ From the `Build Customizations` popup window, check `masm(targets, .props)`. This allows us to use Assembly in our VS project.
+![](./images/masm.png)
+
++ Now that Assembly is enabled in our project, we need to tell Visual Studios that our `functions.asm` file is an Assembly file, and to include it in our build.
++ From the Solution Explorer, right-click our `functions.asm` file and click `Properties`
+![](./images/func.png)
+
++ In the Properties popup go to `Configuration Properties` -> `General`, and set the `Item Type` to `Microsoft Macro Assembler`. Then click `OK` to apply our changes.
+![](./images/func2.png)
+
++ Sometimes VS Optimization does not play well when creating projects with Assembly. For this reason we will disable optimization.
+  + Select the project from the Solution Explorer.
+  + Select `Project` from the main menu, and from the drop-down select `<ProjectName> Properties`
+  + In the project Properties popup, select `Configuration Properties` -> `Advanced`
+  + Change `Whole Program Optimization` to `No Whole Program Optimization`
+  + Click `OK` to save changes
+![](./images/opt.png)
+
+
+5. Switch back to the Kali-Attacker box, convert `beacon.bin` to an array of UUIDs. and transfer `beacon-uuids.txt` to our Windows-Attacker Box
++ Copy the `bin2uuid.py` python3 script from this repo to the Kali-Attacker box.
++ Use the `bin2uuids.py` script to convert the `beacon.bin` payload into a C style array of UUIDs.
++ Run the script and have it output to the `beacon-uuids.txt` text file.
+```bash
+root@kali:~# python3 bin2uuids.py beacon.bin > beacon-uuids.txt
+```
++ Transfer the `beacon-uuids.txt` text file from the Kali-Attacker box to the Windows-Attacker box.
+  + There are multiple ways to do this. One way is:
+    + Open Cobalt Strike on the Windows-Attacker Box
+    + Connect to the teamserver we have running on Kali-Attacker
+    + Create a Beacon as above, but instead of `Raw` select `Windows EXE`
+    + This will save the beacon to the Windows-Attacker file system
+    + Execute the beacon, and switch to Kali-Attacker
+    + Interact with the beacon from Kali-Attacker, and upload the text file with `upload /root/beacon-uuids.txt`
+
+##### Transferring `beacon-uuids.txt` file with Cobalt Strike
+![](./images/b1.png)
+
+6. Compile Ninja_UUID_Runner with our Cobalt Strike Stageless Beacon payload
++ Now that our UUID encoded beacon paylaod is transferred to our Windows-Attacker box, open the `beacon-uuids.txt` with Notepad
++ Select all the text and copy it
+![](./images/b2.png)
+
++ Open `main.c` from our uuid project with Visual Studios.
++ Highlight the default `CHAR* uuid[]` payload, and paste our new Cobalt Strike Stageless Beacon payload.
+![](./images/paste.png)
+
++ Now that our project has our beacon baked-in, click the green play-button in Visual Studios, and get a beacon on the windows-attacker box!
+![](./images/b4.png)
+
++ By looking at the Output window in Visual Studios, we can see that our payload is saved to `C:\Users\Administrator\source\repos\uuid\x64\Release\uuid.exe`
+![](./images/out.png)
+
++ We can now use this as our beacon payload when we need to move laterally by first uploading a beacon file and then executing it with something like `PSExec`! 
 
 ## About
 Shellcode is typically loaded into the `Heap` of the process, or the `VirtualAlloc()` API is used to reserve a private section of memory where the shellcode is then loaded too. Regardless of where the shellcode is in memory, that allocated memory must be marked executable for the shellcode to run. This is typically done by calling the `VirtualProtect()` API, after the shellcode has been written to memory, to change the allocated memory from `RW` (Read-Write) to `RX` (Read-Execute). `RX` sections within modules are common, such as the executable `.TEXT` section of the host process, and the executable `.TEXT` section of a Dynamically Loaded Library (DLL) which has been loaded into the memory of the process. Although, `RX` or `RWX` executable memory sections within the Heap and Privately allocated sections, not backed by a module are suspicious, and easier to detect. To evade this detection, Module Stomping can be used.
@@ -73,8 +192,8 @@ Saved as: calc.bin
 + Open this project in Microsoft Visual Studios.
 + Within the `main.c` file, replace the `uuids[]` array with your array of UUIDs.
 
-### Optionally Change Sacraficial DLL
-+ You may optionally change the sacraficial DLL that has its `RX` section module stomped by our shellcode by changing the `sLib[]` array to a name of a different DLL.
+### Optionally Change Sacrificial DLL
++ You may optionally change the sacrificial DLL that has its `RX` section module stomped by our shellcode by changing the `sLib[]` array to a name of a different DLL.
 + Make sure that the DLL is large enough to hold your shellcode or else you may end up overwriting a neighbor DLL in memory of the process.
 +  Use the `string2array.py` python script to convert the DLL name into an array of chars. 
   +  Alternatively just use a typical string method since we are not creating a Beacon Object File (BOF) or shellcode.
