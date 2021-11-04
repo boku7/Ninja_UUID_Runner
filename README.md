@@ -34,7 +34,7 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 ![](./images/1listen.png)
 
 + From the listeners table, click the `Add` button. A listener window will popup
-+ Select your beacon type, such as `HTTP Beacon` used in this example
++ Select your beacon type, such as `BeaconHTTP` used in this example
 + Give it a name, such as `http` used here
 + For the `HTTP Hosts`, click the `+` button and add the teamservers IP
 + When the beacon listener is the way you want it, click `Save`
