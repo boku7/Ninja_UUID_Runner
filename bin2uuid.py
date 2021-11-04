@@ -11,7 +11,7 @@ if len(sys.argv) < 2:
 
 with open(sys.argv[1], "rb") as f:
     chunk = f.read(16)
-    print("{}const char* uuids[] =".format(' '*4))
+    print("{}CHAR* uuids[] =".format(' '*4))
     print("    {")
     while chunk:
         if len(chunk) < 16:
