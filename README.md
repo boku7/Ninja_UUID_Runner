@@ -10,7 +10,7 @@ Module Stomping, No New Thread, HellsGate syscaller, UUID Shellcode Runner for x
 ## Update - Cobalt Strike Stageless Beacon Support (11/4/21)
 This was tested in the [new Certified Red Team Operator course labs](https://www.zeropointsecurity.co.uk/red-team-ops/overview) which now offers Cobalt Strike access out-of-the-box. If you are interested in digging deeper into Cobalt Strike, I definitely recommend getting your hands dirty with this course!
 
-Since the CRTO labs have Cobalt Strike, for security reasons they do not have connection to the internet. Another hurdle is we cannot copy entire files to and from our CRTO lab. What we can do, is copy-paste text from our host to the the CRTO lab. Since I think these labs are awesome, This walkthrough shows how to get this project working in the CRTO lab environment. 
+Since the CRTO labs have Cobalt Strike, for security reasons they are not connected to the public internet. Another hurdle is we cannot copy entire files to and from our CRTO lab. What we can do, is copy-paste text from our host to the the CRTO lab. Since I think these labs are awesome, This walkthrough shows how to get this project working in the CRTO lab environment. 
 
 ### Cobalt Strike Stageless Beacon Walkthrough
 
