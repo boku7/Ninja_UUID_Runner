@@ -1,6 +1,7 @@
 # Ninja UUID Shellcode Runner
 Module Stomping, No New Thread, HellsGate syscaller, UUID Dropper for x64 Windows 10!
 + Now supports running Cobalt Strike Stageless Beacon Payloads!
++ Walkthrough of how to use in [Zero-Point Security Certified Red Team Operator (CRTO)](https://www.zeropointsecurity.co.uk/red-team-ops/overview) labs below!
 
 ![](./images/ninja.jpg)
 
