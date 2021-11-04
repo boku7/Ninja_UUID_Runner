@@ -30,6 +30,7 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 2. Create a Listener that our stageless beacon payload will connect to, when it is executed on the windows host  
 + From the CobaltStrike GUI, click `Cobalt Strike` from the menu bar, and then select `Listeners`
 + This will display the active listeners in a table, on the bottom half of the CS GUI
+
 ![](./images/1listen.png)
 
 + From the listeners table, click the `Add` button. A listener window will popup
@@ -37,19 +38,22 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 + Give it a name, such as `http` used here
 + For the `HTTP Hosts`, click the `+` button and add the teamservers IP
 + When the beacon listener is the way you want it, click `Save`
+
 ![](./images/2l.png)
 
 3. Create a 64-bit Stageless Cobalt Strike beacon shellcode payload
 + From the CobaltStrike GUI, click `Attacks` from the menu bar, then `Packages`, and select `Windows Executable (S)`
   + The `(S)` means that the payload will be Stageless. A Stageless payload has the entire beacon in it, while the Staged version only has a small stub that calls out to the teamserver and then loads the rest of the beacon.
   + The Staged loader used in Cobalt Strike is flagged. A Staged payload will likely be detected. 
+
 ![](./images/3w.png)
 
 + Select the `http` listener we just created.
 + Change the `Output:` to `Raw`
   + The `Raw` payload will save our Stageless Beacon as pure shellcode.
   + Since the Cobalt Strike Beacon uses the Reflective DLL Loading technique, the shellcode will execute the beacon when it is ran on an Intel x64 processor within a Windows OS.
-![](./images/2l.png)
+
+![](./images/4gen.png)
 
 4. Switch to the Windows host and prepare the UUID runner to run our Beacon payload.
 + Open Visual Studios, and create a blank C++ project.
@@ -57,6 +61,7 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 ![](./images/newitem.png)
 
 + Select `C++ File (.cpp)` and change the name to `main.c`
+
 ![](./images/newitem2.png)
 
 + Do this again and create the file `functions.asm`
@@ -64,10 +69,12 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 + At this point we will have 2 files in our project. 
 + Copy the code in `main.c` of this repo to the `main.c` file we just created in Visual Studios on our Windows-Attacker box within the CRTO labs.
 + Copy the code in `functions.asm` of this repo to the `functions.asm` file on our Windows-Attacker box.
+
 ![](./images/2files.png)
 
 + In the VS Solution Explorer, select the Project.
 + Now select Project from the VS menu, and then `Build Customizations...`
+
 ![](./images/build1.png)
 
 + From the `Build Customizations` popup window, check `masm(targets, .props)`. This allows us to use Assembly in our VS project.
@@ -75,9 +82,11 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
 
 + Now that Assembly is enabled in our project, we need to tell Visual Studios that our `functions.asm` file is an Assembly file, and to include it in our build.
 + From the Solution Explorer, right-click our `functions.asm` file and click `Properties`
+
 ![](./images/func.png)
 
 + In the Properties popup go to `Configuration Properties` -> `General`, and set the `Item Type` to `Microsoft Macro Assembler`. Then click `OK` to apply our changes.
+
 ![](./images/func2.png)
 
 + Sometimes VS Optimization does not play well when creating projects with Assembly. For this reason we will disable optimization.
@@ -86,8 +95,8 @@ root@kali:/opt/cobaltstrike# ./cobaltstrike
   + In the project Properties popup, select `Configuration Properties` -> `Advanced`
   + Change `Whole Program Optimization` to `No Whole Program Optimization`
   + Click `OK` to save changes
-![](./images/opt.png)
 
+![](./images/opt.png)
 
 5. Switch back to the Kali-Attacker box, convert `beacon.bin` to an array of UUIDs. and transfer `beacon-uuids.txt` to our Windows-Attacker Box
 + Copy the `bin2uuid.py` python3 script from this repo to the Kali-Attacker box.
@@ -111,16 +120,20 @@ root@kali:~# python3 bin2uuids.py beacon.bin > beacon-uuids.txt
 6. Compile Ninja_UUID_Runner with our Cobalt Strike Stageless Beacon payload
 + Now that our UUID encoded beacon paylaod is transferred to our Windows-Attacker box, open the `beacon-uuids.txt` with Notepad
 + Select all the text and copy it
+
 ![](./images/b2.png)
 
 + Open `main.c` from our uuid project with Visual Studios.
 + Highlight the default `CHAR* uuid[]` payload, and paste our new Cobalt Strike Stageless Beacon payload.
+
 ![](./images/paste.png)
 
 + Now that our project has our beacon baked-in, click the green play-button in Visual Studios, and get a beacon on the windows-attacker box!
+
 ![](./images/b4.png)
 
 + By looking at the Output window in Visual Studios, we can see that our payload is saved to `C:\Users\Administrator\source\repos\uuid\x64\Release\uuid.exe`
+
 ![](./images/out.png)
 
 + We can now use this as our beacon payload when we need to move laterally by first uploading a beacon file and then executing it with something like `PSExec`! 
